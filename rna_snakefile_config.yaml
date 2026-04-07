@@ -1,0 +1,6 @@
+# ── Required ──────────────────────────────────────────────────────────────────
+genomes: "/lustre/fs4/flam_lab/scratch/jmcdonald/RNAseq_testing/snakey/meta_genomes"
+rna: "/lustre/fs4/flam_lab/scratch/jmcdonald/RNAseq_testing/snakey/raw_seq/wt.fastq"
+
+# ── Optional ──────────────────────────────────────────────────────────────────
+threads: 8
