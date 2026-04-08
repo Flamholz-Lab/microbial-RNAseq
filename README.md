@@ -36,3 +36,6 @@ Options (https://www.rna-seqblog.com/rpkm-fpkm-and-tpm-clearly-explained/):
 TPM seems to be the gold standard, so I'm using that. So we are measuring a relative abundance of the mRNA to some absolute mRNA content that we don't know (how could we find out?).
 
 We expect relative abundance of a given gene's mRNA to change by some scaling factor (e.g. the slope of condition 1 vs condition 2), and that scaling factor is roughly proportional to the growth rates in condition 1 vs. 2 (Keren et al. 2013). When the relative abundance of a gene's mRNA deviates signficantly (note to self: how do we derive significance here?) from said line, we suspect some biological relevance to nutrient starvation.
+
+I seem to be getting mismatched hits (wrong organism RNA -> wrong organism genome) from very small "genes" that are annotated by Prokka. I wonder if I should set a minimum gene length. Otherwise can go through unexpected hits manually to see if they make sense. 
+
