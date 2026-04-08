@@ -1,6 +1,9 @@
 # ── Required ──────────────────────────────────────────────────────────────────
 genomes: "/lustre/fs4/flam_lab/scratch/jmcdonald/RNAseq_testing/snakey/meta_genomes"
-rna: "/lustre/fs4/flam_lab/scratch/jmcdonald/RNAseq_testing/snakey/raw_seq/wt.fastq"
+rna: "/lustre/fs4/flam_lab/scratch/jmcdonald/RNAseq_testing/snakey/raw_seq/n_lim.fastq"
+gtf_process_path: "/lustre/fs4/flam_lab/scratch/jmcdonald/scripts/gtf_processing.py"
+count_path: "/lustre/fs4/flam_lab/scratch/jmcdonald/scripts/gene_count_integration.py"
+
 
 # ── Optional ──────────────────────────────────────────────────────────────────
 threads: 8
