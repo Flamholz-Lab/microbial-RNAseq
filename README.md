@@ -15,7 +15,7 @@ First edit the config file to reflect your directory containing genomes and your
 
 To run on the HPC use:
 
-{`sbatch rna_snakefile_run.sh`} 
+`sbatch rna_snakefile_run.sh`
 
 The pipeline should run quickly, about 10 min or so. It can easily run on your own device.
 
