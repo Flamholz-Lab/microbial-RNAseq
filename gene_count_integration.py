@@ -2,45 +2,44 @@ import pandas as pd
 import sys
 
 #inputs
-count_file  = sys.argv[1]
-map_file  = sys.argv[2]
-count_bam_name = sys.argv[3]
+tpm_file  = sys.argv[1]
+ann_file  = sys.argv[2]
 
-# Load featureCounts output
-counts = pd.read_csv(count_file, sep="\t", comment="#")
+# Read the gene counts table
+tpm_file = pd.read_csv(tpm_file, sep=r"\s+", engine="python")
+tpm_file.columns = ["gene_id", "Chr", "Start", "End", "Length", "Reads", "TPM", 
+                  "ExonLength", "ExonReads", "ExonTPM", "IntronLength", 
+                  "IntronReads", "IntronTPM", "UniqueLength", "UniqueReads", 
+                  "UniqueTPM", "UniqueExonLength", "UniqueExonReads", 
+                  "UniqueExonTPM", "UniqueIntronLength", "UniqueIntronReads", 
+                  "UniqueIntronTPM"]
 
-# Load gene → organism mapping
-mapping = pd.read_csv(map_file, sep="\t",
-                      names=["contig","source","feature","start","end",
-                             "score","strand","frame","attributes","organism"])
-mapping["gene_id"] = mapping["attributes"].str.extract(r'ID=([^;]+)')
+# Read annotation file - ONLY columns 0-8 (ignore extra columns)
+ann_cols = [0,1,2,3,4,5,6,7,8]  # First 9 columns only
+ann = pd.read_csv(ann_file, sep=r"\s+", usecols=ann_cols, 
+                  header=None, engine="python")
 
-# Load ALL Prokka .tsv annotation files and combine
-annotation_frames = []
-import glob
+# Read raw lines, parse manually
+with open(ann_file) as f:
+    lines = [line.strip().split("\t", 8) for line in f if not line.startswith("#")]
 
-for tsv in glob.glob("prokka/*/*.tsv"):
-    df = pd.read_csv(tsv, sep="\t")
-    annotation_frames.append(df)
+ann = pd.DataFrame(lines, columns=[f"col{i}" for i in range(9)])
+ann["gene_id"] = ann["col8"].str.extract(r'locus_tag=([^;]+)', expand=False)
+ann["Product"] = ann["col8"].str.extract(r'product=([^;\t]+)', expand=False)
+ann["Name"] = ann["col8"].str.extract(r'Name=([^;]+)', expand=False)
 
-prokka_annotations = pd.concat(annotation_frames, ignore_index=True)
-# Prokka .tsv columns: locus_tag, ftype, length_bp, gene, EC_number, COG, product
-prokka_annotations = prokka_annotations[["locus_tag", "gene", "product"]]
 
-# Merge everything together
-final = counts.merge(mapping[["gene_id", "organism"]],
-                     left_on="Geneid", right_on="gene_id")
+# Clean Name field
+ann["Name"] = ann["Name"].fillna("").str.strip()
 
-final = final.merge(prokka_annotations,
-                    left_on="Geneid", right_on="locus_tag",
-                    how="left")  # left join so genes with no annotation aren't dropped
+# Keep only rows with gene_id and drop duplicates
+ann_small = ann[["gene_id", "Name", "Product"]].dropna(subset=["gene_id"])
 
-# Select and rename final columns
-final = final[["Geneid", "gene", "product", "organism", count_bam_name]]
-final.columns = ["gene_id", "gene_name", "product", "organism", "count"]
+# Merge counts with annotation on gene_id
+merged = tpm_file.merge(ann_small, on="gene_id", how="left")
 
-# Optional: flag unannotated genes clearly
-final["product"] = final["product"].fillna("hypothetical protein")
-final["gene_name"] = final["gene_name"].fillna("unknown")
+# Select and reorder final columns
+final = merged[["gene_id", "Chr", "Reads", "TPM", "Name", "Product"]]
 
+# Write output
 final.to_csv("final_gene_counts.csv", index=False)
