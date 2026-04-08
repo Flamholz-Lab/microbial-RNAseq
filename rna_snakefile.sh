@@ -5,7 +5,10 @@ configfile: "rna_snakefile_config.yaml"
 
 GENOMES = config["genomes"]
 RNA     = config["rna"]
+GTF_PROCESS_PATH = config["gtf_process_path"]
+COUNT_PATH = config["count_path"]
 THREADS = config["threads"]
+
 
 rule all:
     input:
@@ -15,7 +18,9 @@ rule all:
         "aligned.bam.bai",
         "featureCounts/counts.txt",
         "gene_to_organism_map.tsv",
-        "final_gene_counts.csv"
+        "final_gene_counts.csv",
+        "combined.gtf",
+        "aligned_genes.out"
 
 # ── Merge genomes into one "barcoded" reference ────────────────────────────────────────────
 rule merge:
@@ -38,7 +43,9 @@ rule merge:
 # ── Annotate each individual genome with prokka ─────────────────────────────────────────
 rule annotate:
     input: GENOMES
-    output: "combined_annotation.gff"
+    output:
+        gff    = "combined_annotation.gff",
+        prokka = directory("prokka")
     threads: THREADS
     conda: "/ru-auth/local/home/jmcdonald/miniconda3/envs/prokka"
     shell:
@@ -50,11 +57,10 @@ rule annotate:
                 prokka --outdir "prokka/$prefix" --prefix "$prefix" "$fa_file"
             done
         done
-        cat prokka/*/*.gff > {output}
+        cat prokka/*/*.gff > {output.gff}
         """
 
 # ── Align RNAseq reads to combined genome reference ────────────────────────────
-#do you need to deal with gene length here?
 rule alignment:
     input:
         genome = "combined_genomes.fasta",
@@ -87,16 +93,51 @@ rule featureCounts:
             -t CDS -g ID -T {threads} {input.bam}
         """
 
+# ── GTF processing ────────────────────────────────────
+rule GTF_processing:
+    input:
+        annotation = "combined_annotation.gff",
+        path       = GTF_PROCESS_PATH
+    output:
+        "combined.gtf"
+    threads: THREADS
+    conda: "/ru-auth/local/home/jmcdonald/miniconda3/envs/tpmcalculator"
+    shell:
+        """
+        #Remove extra headers in the prokka GFF
+        grep -v "^##sequence-region" {input.annotation} > clean.gff
+        
+        #Convert GFF to GTF
+        agat_convert_sp_gff2gtf.pl \
+            --gff clean.gff \
+            --out clean.gtf
 
-#add tpm calculation step
+        # Replace gene_id with locus_tag in the GTF
 
+        python {input.path} clean.gtf {output}
+
+        """
+
+# ── Calculate TPMs ────────────────────────────────────
+rule tpmcalculator:
+    input:
+        gtf    = "combined.gtf",
+        bam    = "aligned.bam"
+    output:
+        tpm = "aligned_genes.out"
+    threads: THREADS
+    conda: "/ru-auth/local/home/jmcdonald/miniconda3/envs/tpmcalculator"
+    shell:
+        """
+        TPMCalculator -g {input.gtf} -b {input.bam}
+        """
 
 # ── Create gene-to-organism map ─────────────────────────────
 rule source_mapping:
     input:
         genomes = GENOMES,
-        #annot   = "combined_annotation.gff"  # Ensures annotate runs first
-    output: 
+        prokka  = "prokka"
+    output:
         "gene_to_organism_map.tsv"
     threads: THREADS
     conda: "/ru-auth/local/home/jmcdonald/miniconda3/envs/alignment"
@@ -104,7 +145,7 @@ rule source_mapping:
         """
         for bin in {input.genomes}/*.fa; do
             name=$(basename $bin .fa)
-            grep -v "^#" prokka/$name/$name.gff | \
+            grep -v "^#" {input.prokka}/$name/$name.gff | \
             awk -v org="$name" '$3=="CDS" {{print $0"\t"org}}'
         done > {output}
         """
@@ -112,12 +153,12 @@ rule source_mapping:
 # ── Final table ─────────────────────────────────────────────
 rule formatting:
     input:
-        counts   = "featureCounts/counts.txt",
+        tpm   = "aligned_genes.out",
         mapping  = "gene_to_organism_map.tsv",
-        bam      = "aligned.bam"
+        path     = COUNT_PATH
     output: "final_gene_counts.csv"
     conda: "/ru-auth/local/home/jmcdonald/miniconda3/envs/alignment"
     shell:
         """
-        python /lustre/fs4/flam_lab/scratch/jmcdonald/scripts/gene_count_integration.py {input.counts} {input.mapping} {input.bam}
+        python {input.path} {input.tpm} {input.mapping}
         """
