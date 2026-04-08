@@ -17,7 +17,7 @@ To run on the HPC use:
 
 `sbatch rna_snakefile_run.sh`
 
-The pipeline should run quickly, about 10 min or so. It can easily run on your own device.
+The pipeline should run quickly, about 10 min or so but scales with the number of genomes you need to annotate. It should be able to run on your own device.
 
 ## Outputs
 A formatted .csv file with the gene name, function, source organism, and RNAseq counts: \
