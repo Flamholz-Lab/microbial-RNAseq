@@ -9,7 +9,8 @@ To run, you’ll need three files in your working directory or path:
 `rna_snakefile` \
 `rna_snakefile_config.yaml` \
 `rna_snakefile_run.sh` \
-`gene_count_integration.py` 
+`gene_count_integration.py` \
+`gtf_processing.py`
 
 First edit the config file to reflect your directory containing genomes and your RNA .fastq file. The actual snakefile (/rna_snakefile.sh) should not need to be edited. Note that the snakefile utilizes conda environments that I’ve created under my profile in HPC storage. TBD if others in the lab can access those. If not, you will want to make your own conda environments that have the right packages.
 
