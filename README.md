@@ -4,7 +4,7 @@ RNA sequencing analysis pipelines
 ## Inputs
 This repository contains a snakemake pipeline that takes a directory of assembled genomes (in .fa format) and RNAseq reads (in .fastq format) as input and runs through genome annotation, RNA normalization, mapping, and counting steps. It also contains a jupyter notebook to visualize outputs (`/genome-RNA-scatter.ipynb`).
 
-To run, you’ll need three files in your working directory or path:
+To run, you’ll need these files in your working directory or path:
 
 `rna_snakefile` \
 `rna_snakefile_config.yaml` \
