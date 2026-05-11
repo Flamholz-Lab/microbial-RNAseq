@@ -1,0 +1,5 @@
+# ── Required ──────────────────────────────────────────────────────────────────
+genomes: "/Users/juliemcdonald/Documents/flamholz_lab/RNASeq_testing/two_part_snakefile/local_testing/meta_genomes"
+
+# ── Optional ──────────────────────────────────────────────────────────────────
+threads: 8

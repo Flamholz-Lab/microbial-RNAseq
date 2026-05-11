@@ -1,0 +1,12 @@
+# ── Required ──────────────────────────────────────────────────────────────────
+combined_fasta: "/Users/juliemcdonald/Documents/flamholz_lab/RNASeq_testing/two_part_snakefile/local_testing/combined_genomes.fasta"
+combined_anno: "/Users/juliemcdonald/Documents/flamholz_lab/RNASeq_testing/two_part_snakefile/local_testing/combined_annotation.gff"
+gtf_process_path: "/Users/juliemcdonald/Documents/flamholz_lab/scripts/gtf_processing.py"
+count_path: "/Users/juliemcdonald/Documents/flamholz_lab/scripts/gene_count_integration.py"
+map: "gene_to_organism_map.tsv"
+
+rna: "/Volumes/One_Touch/ncbi_data/switzer/lim_24h_R2.fastq"
+outdir: "switzer_lim_24h_R2"
+
+# ── Optional ──────────────────────────────────────────────────────────────────
+threads: 8
