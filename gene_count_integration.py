@@ -26,20 +26,23 @@ with open(ann_file) as f:
 ann = pd.DataFrame(lines, columns=[f"col{i}" for i in range(9)])
 ann["gene_id"] = ann["col8"].str.extract(r'locus_tag=([^;]+)', expand=False)
 ann["Product"] = ann["col8"].str.extract(r'product=([^;\t]+)', expand=False)
-ann["Name"] = ann["col8"].str.extract(r'Name=([^;]+)', expand=False)
+ann["gene"] = ann["col8"].str.extract(r'gene=([^;\t]+)', expand=False)
+
+
+
 
 
 # Clean Name field
-ann["Name"] = ann["Name"].fillna("").str.strip()
+#ann["gene"] = ann["gene"].fillna("").str.strip()
 
 # Keep only rows with gene_id and drop duplicates
-ann_small = ann[["gene_id", "Name", "Product"]].dropna(subset=["gene_id"])
+ann_small = ann[["gene_id", "gene", "Product"]].dropna(subset=["gene_id"])
 
 # Merge counts with annotation on gene_id
 merged = tpm_file.merge(ann_small, on="gene_id", how="left")
 
 # Select and reorder final columns
-final = merged[["gene_id", "Chr", "Reads", "TPM", "Name", "Product"]]
+final = merged[["gene_id", "Chr", "Reads", "TPM", "gene", "Product", "Start", "End", "Length",]]
 
 # Write output
 final.to_csv("final_gene_counts.csv", index=False)
