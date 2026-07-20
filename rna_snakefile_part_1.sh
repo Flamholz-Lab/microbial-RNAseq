@@ -1,3 +1,13 @@
+'''
+-----------------------------------------------------------------------------------------------
+Part 1: Combine and annotate all individual species genomes 
+
+1. Concatenate all individual fasta files
+2. Annotate combined genome with Bakta
+3. Make map of gene <-> species
+-----------------------------------------------------------------------------------------------
+'''
+
 import os
 import glob
 
