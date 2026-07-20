@@ -2,31 +2,32 @@
 RNA sequencing analysis pipelines
 
 ## Inputs
-This repository contains a snakemake pipeline that takes a directory of assembled genomes (in .fa format) and RNAseq reads (in .fastq format) as input and runs through genome annotation, RNA normalization, mapping, and counting steps. It also contains a jupyter notebook to visualize outputs (`/genome-RNA-scatter.ipynb`).
+This repository contains two snakemake pipelines that takes a directory of assembled genomes (in .fa format) and RNAseq reads (in .fastq format) as inputs and runs through genome annotation, RNA normalization, mapping, and counting steps. It also contains a jupyter notebook to visualize outputs (`/genome-RNA-scatter.ipynb`).
 
 To run, you’ll need these files in your working directory or path:
 
-`rna_snakefile` \
-`rna_snakefile_config.yaml` \
-`rna_snakefile_run.sh` \
+`rna_snakefile_part_1.sh` \
+`rna_snakefile_part_2.sh` \
+`rna_snakefile_part_1_config.yaml` \
+`rna_snakefile_part_2_config.yaml` \
 `gene_count_integration.py` \
 `gtf_processing.py`
 
-First edit the config file to reflect your directory containing genomes and your RNA .fastq file. The actual snakefile (/rna_snakefile.sh) should not need to be edited. Note that the snakefile utilizes conda environments that I’ve created under my profile in HPC storage. TBD if others in the lab can access those. If not, you will want to make your own conda environments that have the right packages.
+First edit the config files to reflect your directory containing genomes and your RNA .fastq file. Note that the snakefile utilizes conda environments that I’ve created under my profile in HPC storage. TBD if others in the lab can access those. If not, you will want to make your own conda environments that have the right packages.
 
 To run on the HPC use:
 
 `sbatch rna_snakefile_run.sh`
 
-The pipeline should run quickly, about 10 min or so but scales with the number of genomes you need to annotate. It should be able to run on your own device.
+To run locally, create a conda environment containing snakemake, activate and use:
+
+`snakemake --snakefile rna_snakefile_part_1.sh --use-conda --jobs 10`
+
+The pipelines should run quickly, about 20 min or so but scales with the number of genomes you need to annotate. It should be able to run on your own device.
 
 ## Outputs
 A formatted .csv file with the gene name, function, source organism, and RNAseq counts: \
 `final_gene_counts.csv/` 
-
-In `example_outputs/`, I ran the snakefile on two different sample E. coli transcriptome experiments and aligned to C. necator, E. coli, and P. aeruginosa genomes. Obviously there were limited to no hits to C. necator or P. aeruginosa. I generated final_counts sheets for each condition, then merged and analyzed them into `merged_gene_counts.csv` using `genome-RNA-scatter.ipynb`. I used plotly in that notebook to generate `wt_vs_lim.html`, which is an interactive map of the nutrient-limited vs. WT transcriptomes.
-
-With real data I'll plot multiple genome-resolved samples at once to look at regulation more closely. 
 
 ## Notes and musings
 What count normalization to use for sequencing data? 
