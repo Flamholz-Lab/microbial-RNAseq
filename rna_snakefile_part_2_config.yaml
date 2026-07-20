@@ -1,0 +1,15 @@
+# ── Required ──────────────────────────────────────────────────────────────────
+genomes: "/Users/juliemcdonald/Documents/flamholz_lab/tri_strain_pilot/260616_quintara_RNAseq/260720_rRNA_percent/genomes"
+combined_fasta: "/Users/juliemcdonald/Documents/flamholz_lab/tri_strain_pilot/260616_quintara_RNAseq/260714_4_genome_analysis/combined_genomes.fasta"
+combined_anno: "/Users/juliemcdonald/Documents/flamholz_lab/tri_strain_pilot/260616_quintara_RNAseq/260714_4_genome_analysis/combined_annotation.gff3"
+gtf_process_path: "/Users/juliemcdonald/Documents/flamholz_lab/scripts/gtf_processing.py"
+count_path: "/Users/juliemcdonald/Documents/flamholz_lab/scripts/gene_count_integration.py"
+map: "/Users/juliemcdonald/Documents/flamholz_lab/tri_strain_pilot/260616_quintara_RNAseq/260714_4_genome_analysis/gene_to_organism_map.tsv"
+
+rna_F: "/Users/juliemcdonald/Documents/flamholz_lab/tri_strain_pilot/260616_quintara_RNAseq/raw/result/Filter/Clean_Data/1124417_S1.R1.fastq"
+rna_R: "/Users/juliemcdonald/Documents/flamholz_lab/tri_strain_pilot/260616_quintara_RNAseq/raw/result/Filter/Clean_Data/1124417_S1.R2.fastq"
+
+outdir: "1124417_S1"
+
+# ── Optional ──────────────────────────────────────────────────────────────────
+threads: 8
